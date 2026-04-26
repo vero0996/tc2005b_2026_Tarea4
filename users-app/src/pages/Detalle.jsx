@@ -1,11 +1,10 @@
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 function Detalle() {
   const { id } = useParams();
 
-  const [usuario, setUsuario] = useState(null);
+  const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
 
@@ -13,13 +12,13 @@ function Detalle() {
     setCargando(true);
     setError(false);
 
-    fetch(`https://jsonplaceholder.typicode.com/users/${Number(id)}`)
+    fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (!data.id) {
           setError(true);
         } else {
-          setUsuario(data);
+          setDatos(data);
         }
         setCargando(false);
       })
@@ -29,30 +28,49 @@ function Detalle() {
       });
   }, [id]);
 
-    if (cargando) return <p className="center">Cargando...</p>;
-    if (error) return <p className="center">Usuario no encontrado</p>;
-
+  if (cargando) {
     return (
-    <div className="container">
-        <div className="result-card">
-            <div className="avatar">
-            {usuario.name[0]}
-            </div>
+      <div className="card">
+        <div className="loader"></div>
+      </div>
+    );
+  }
 
-            <h2>{usuario.name}</h2>
-            <p>ID #{usuario.id}</p>
+  if (error) {
+    return (
+      <div className="card">
+        <p>Usuario no encontrado.</p>
+        <Link to="/" className="volver">← Volver</Link>
+      </div>
+    );
+  }
 
-            <div className="label">Email</div>
-            <div className="value">{usuario.email}</div>
-
-            <div className="label">Ciudad</div>
-            <div className="value">{usuario.address.city}</div>
-
-            <div className="label">Empresa</div>
-            <div className="value">{usuario.company.name}</div>
-
-            <Link to="/" className="back">← Volver</Link>
+  return (
+    <div className="card">
+      <div className="usuario-header">
+        <div className="avatar">{datos.name[0]}{datos.name.split(" ")[1]?.[0]}</div>
+        <div>
+          <h2>{datos.name}</h2>
+          <p className="subtitulo">ID #{datos.id}</p>
         </div>
+      </div>
+
+      <div className="campo">
+        <span className="campo-label">Email</span>
+        <span className="campo-valor link">{datos.email}</span>
+      </div>
+
+      <div className="campo">
+        <span className="campo-label">Ciudad</span>
+        <span className="campo-valor">{datos.address.city}</span>
+      </div>
+
+      <div className="campo">
+        <span className="campo-label">Empresa</span>
+        <span className="campo-valor">{datos.company.name}</span>
+      </div>
+
+      <Link to="/" className="volver">← Volver</Link>
     </div>
   );
 }
